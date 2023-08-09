@@ -38,6 +38,12 @@ begin
 
     if new_input
       $inputting << new_input
+
+      while $inputting.length > 0 && $inputting.include?("\x7F")
+        $inputting.sub!(/.\x7F/, '')
+        $inputting = '' if $inputting.chars.uniq == ["\x7F"]
+      end
+
       print "#{$inputting}█\r"
     end
 
