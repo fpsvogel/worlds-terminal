@@ -1,8 +1,3 @@
-require 'time'
+print "\033[?25l"
 
-loop do
-  time = Time.now.to_s + "\r"
-  print time
-  $stdout.flush
-  sleep 1
-end
+c = gets

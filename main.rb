@@ -1,56 +1,64 @@
 require 'debug'
-require 'remedy'
-include Remedy
+require 'colorize'
 
-abs_time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-time_start = abs_time_start
-ms_counter = 0
-reader = Interaction.new
-inputting = ''
-output = Content.new
+print "\033[?25l" # Hide cursor
 
-reader.loop do |key|
-  if key == "\n"
-    output << "You said: #{inputting}"
-    inputting = ''
-  else
-    inputting << key.to_s
-  end
+time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-  time_now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-  time_elapsed = time_now - time_start
+$inputting = ''
+input_line = nil
 
-  if time_elapsed >= 0.01
-    ms_counter += 1
-    time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+class IO
+  def read_all_nonblock
+    line = ""
 
-    screen = Viewport.new
-    prompt = Partial.new
-    prompt << "> #{inputting}█"
-    output << 'no content' if output.lines.empty?
-    screen.draw output, Size.new(0,0), prompt
-  end
-
-  if ms_counter == 100
-    debugger
-    output << "One second has passed!"
-    ms_counter = 0
-    output << "Absolute time elapsed: #{time_now - abs_time_start}"
+    while char = self.read_nonblock(1, exception: false)
+      return line if char == :wait_readable
+      line << char
+    end
   end
 end
 
-puts "Oh, I quit."
+def output(str)
+  terminal_width = `tput cols`.to_i
+  padding = terminal_width - str.length
+  padding = 0 if padding < 0
 
-# include Remedy
-# title = Partial.new
-# title << "Someone Said These Were Good"
+  puts "#{str}#{' ' * padding}"
+  print "#{$inputting}█\r"
+end
 
-# jokes = Content.new
-# jokes << %q{1. A woman gets on a bus with her baby. The bus driver says: 'Ugh, that's the ugliest baby I've ever seen!' The woman walks to the rear of the bus and sits down, fuming. She says to a man next to her: 'The driver just insulted me!' The man says: 'You go up there and tell him off. Go on, I'll hold your monkey for you.'}
-# jokes << %q{2. I went to the zoo the other day, there was only one dog in it, it was a shitzu.}
+begin
+  loop do
+    `stty raw -echo`
+    new_input = STDIN.read_all_nonblock
+    `stty -raw echo`
 
-# disclaimer = Partial.new
-# disclaimer << "According to a survey they were funny. I didn't make them."
+    if new_input
+      $inputting << new_input
+      print "#{$inputting}█\r"
+    end
 
-# screen = Viewport.new
-# screen.draw jokes, Size.new(0,0), title, disclaimer
+    if $inputting.chars.include?("\n") || $inputting.chars.include?("\r")
+      input_line = $inputting.split(/[\n\r]/).first
+      $inputting = ''
+    end
+
+    if input_line
+      output "You said: #{input_line}"
+      break if input_line == 'exit'
+      input_line = nil
+    end
+
+    time_now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    time_elapsed = time_now - time_start
+    if time_elapsed >= 1
+      output "One second has passed!".blue
+      time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+  end
+
+  output "Oh, I quit."
+ensure
+  print "\033[?25h" # Show cursor
+end
