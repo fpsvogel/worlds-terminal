@@ -1,24 +1,13 @@
 require 'debug'
+require 'tty-reader'
 
+reader = TTY::Reader.new
 time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-class IO
-  def readline_nonblock
-    line = ""
-
-    while char = self.read_nonblock(1, exception: false)
-      return nil if char == :wait_readable
-      return line if char == "\n"
-      line << char
-    end
-  end
-end
-
 loop do
-  if line = STDIN.readline_nonblock
-    puts "I found an #{line}"
-    break if line == 'exit'
-  end
+  line = reader.read_line(nonblock: true).chomp
+
+  break if line == 'exit'
 
   time_now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   time_elapsed = time_now - time_start
