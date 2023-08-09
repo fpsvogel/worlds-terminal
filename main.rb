@@ -1,7 +1,7 @@
 require 'debug'
 require 'colorize'
 
-print "\033[?25l" # Hide cursor
+print "\033[?25l" # Hide cursor, from https://stackoverflow.com/a/50152099
 
 time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
@@ -9,6 +9,7 @@ $inputting = ''
 input_line = nil
 
 class IO
+  # Based on https://stackoverflow.com/a/9900628
   def read_all_nonblock
     line = ""
 
@@ -20,7 +21,7 @@ class IO
 end
 
 def output(str)
-  terminal_width = `tput cols`.to_i
+  terminal_width = `tput cols`.to_i # From https://gist.github.com/KINGSABRI/4687864
   padding = terminal_width - str.length
   padding = 0 if padding < 0
 
@@ -30,6 +31,7 @@ end
 
 begin
   loop do
+    # TODO: make this work on Windows: https://stackoverflow.com/a/22659929
     `stty raw -echo`
     new_input = STDIN.read_all_nonblock
     `stty -raw echo`
