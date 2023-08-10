@@ -2,6 +2,7 @@ require 'debug'
 require 'colorize'
 
 print "\033[?25l" # Hide cursor, from https://stackoverflow.com/a/50152099
+`stty raw -echo`
 
 time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
@@ -25,19 +26,21 @@ def output(str)
   padding = terminal_width - str.length
   padding = 0 if padding < 0
 
+  `stty -raw echo`
   puts "#{str}#{' ' * padding}"
-  print "#{$inputting}█\r"
+  `stty raw -echo`
 end
 
 begin
   loop do
     # TODO: make this work on Windows: https://stackoverflow.com/a/22659929
-    `stty raw -echo`
     new_input = STDIN.read_all_nonblock
-    `stty -raw echo`
 
     if new_input
-      $inputting << new_input
+      new_input_has_newline = new_input.include?("\n") || new_input.include?("\r")
+      new_input = new_input.split(/[\n\r]/).first if new_input_has_newline
+
+      $inputting << (new_input || '')
 
       while $inputting.length > 0 && $inputting.include?("\x7F")
         $inputting.sub!(/.\x7F/, '')
@@ -47,12 +50,10 @@ begin
       print "#{$inputting}█\r"
     end
 
-    if $inputting.chars.include?("\n") || $inputting.chars.include?("\r")
-      input_line = $inputting.split(/[\n\r]/).first
+    if new_input_has_newline
+      input_line = $inputting
       $inputting = ''
-    end
 
-    if input_line
       output "You said: #{input_line}"
       break if input_line == 'exit'
       input_line = nil
@@ -68,5 +69,6 @@ begin
 
   output "Oh, I quit."
 ensure
+  `stty -raw echo`
   print "\033[?25h" # Show cursor
 end
