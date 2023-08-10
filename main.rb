@@ -1,50 +1,15 @@
 require 'debug'
 require 'pastel'
-
-class WorldsGemStub
-  UPDATES_PER_SECOND = 1
-
-  def self.loop(input = nil)
-    @time_start ||= Process.clock_gettime(Process::CLOCK_MONOTONIC)
-
-    time_now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    time_elapsed = time_now - @time_start
-
-    return process_input(input) if input
-
-    if time_elapsed >= (1.0 / UPDATES_PER_SECOND)
-      @time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      return update
-    end
-  end
-
-  def self.process_input(input)
-    outputs = []
-
-    outputs << { color: :white, content: "You said: #{input}" }
-    outputs << { special: :exit } if input == 'exit'
-
-    outputs
-  end
-
-  def self.update
-    outputs = []
-
-    seconds = 1.0 / UPDATES_PER_SECOND.round(2)
-    outputs << { color: :blue, content: "#{seconds} seconds have passed!" }
-
-    outputs
-  end
-end
+require_relative 'worlds_gem_stub'
 
 PASTEL = Pastel.new
+BACKSPACE = "\x7F"
 print "\033[?25l" # Hide cursor, from https://stackoverflow.com/a/50152099
-`stty raw -echo`
-
-$inputting = ''
-input_line = nil
+`stty raw -echo` # To allow output above input line, off input buffer and echo.
+@input_buffer = '' # Needed here now that the console input buffer is off.
 
 class IO
+  # To allow output above input line.
   # Based on https://stackoverflow.com/a/9900628
   def read_all_nonblock
     line = ""
@@ -56,6 +21,7 @@ class IO
   end
 end
 
+# To allow output above input line.
 def puts_stty(str)
   terminal_width = `tput cols`.to_i # From https://gist.github.com/KINGSABRI/4687864
   padding = terminal_width - str.length
@@ -75,19 +41,19 @@ def game_loop
       new_input_has_newline = new_input.include?("\n") || new_input.include?("\r")
       new_input = new_input.split(/[\n\r]/).first if new_input_has_newline
 
-      $inputting << (new_input || '')
+      @input_buffer << (new_input || '')
 
-      while $inputting.length > 0 && $inputting.include?("\x7F")
-        $inputting.sub!(/.\x7F/, '')
-        $inputting = '' if $inputting.chars.uniq == ["\x7F"]
+      while @input_buffer.length > 0 && @input_buffer.include?(BACKSPACE)
+        @input_buffer.sub!(/.#{BACKSPACE}/, '')
+        @input_buffer = '' if @input_buffer.chars.uniq == [BACKSPACE]
       end
 
-      print "#{$inputting}█\r"
+      print "#{@input_buffer}█\r"
     end
 
     if new_input_has_newline
-      input_line = $inputting
-      $inputting = ''
+      input_line = @input_buffer
+      @input_buffer = ''
     end
 
     if outputs = WorldsGemStub.loop(input_line)
