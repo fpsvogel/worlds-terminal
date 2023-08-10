@@ -1,10 +1,45 @@
 require 'debug'
-require 'colorize'
+require 'pastel'
 
+class WorldsGemStub
+  UPDATES_PER_SECOND = 1
+
+  def self.loop(input = nil)
+    @time_start ||= Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+    time_now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    time_elapsed = time_now - @time_start
+
+    return process_input(input) if input
+
+    if time_elapsed >= (1.0 / UPDATES_PER_SECOND)
+      @time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      return update
+    end
+  end
+
+  def self.process_input(input)
+    outputs = []
+
+    outputs << { color: :white, content: "You said: #{input}" }
+    outputs << { special: :exit } if input == 'exit'
+
+    outputs
+  end
+
+  def self.update
+    outputs = []
+
+    seconds = 1.0 / UPDATES_PER_SECOND.round(2)
+    outputs << { color: :blue, content: "#{seconds} seconds have passed!" }
+
+    outputs
+  end
+end
+
+PASTEL = Pastel.new
 print "\033[?25l" # Hide cursor, from https://stackoverflow.com/a/50152099
 `stty raw -echo`
-
-time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
 $inputting = ''
 input_line = nil
@@ -21,7 +56,7 @@ class IO
   end
 end
 
-def output(str)
+def puts_stty(str)
   terminal_width = `tput cols`.to_i # From https://gist.github.com/KINGSABRI/4687864
   padding = terminal_width - str.length
   padding = 0 if padding < 0
@@ -31,7 +66,7 @@ def output(str)
   `stty raw -echo`
 end
 
-begin
+def game_loop
   loop do
     # TODO: make this work on Windows: https://stackoverflow.com/a/22659929
     new_input = STDIN.read_all_nonblock
@@ -53,21 +88,24 @@ begin
     if new_input_has_newline
       input_line = $inputting
       $inputting = ''
-
-      output "You said: #{input_line}"
-      break if input_line == 'exit'
-      input_line = nil
     end
 
-    time_now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    time_elapsed = time_now - time_start
-    if time_elapsed >= 1
-      output "One second has passed!".blue
-      time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    if outputs = WorldsGemStub.loop(input_line)
+      outputs.each do |output|
+        return if output[:special] == :exit
+
+        puts_stty PASTEL.send(output[:color], output[:content])
+      end
     end
+
+    input_line = nil if input_line
   end
+end
 
-  output "Oh, I quit."
+begin
+  game_loop
+
+  puts_stty "Oh, I quit."
 ensure
   `stty -raw echo`
   print "\033[?25h" # Show cursor
