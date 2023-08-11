@@ -1,13 +1,13 @@
 require 'debug'
-require_relative 'console_helper'
-require_relative 'game'
+require_relative 'worlds_console/helper'
+require_relative 'worlds_console/game'
 
-ConsoleHelper.hide_cursor!
-ConsoleHelper.output_mode_special!
+WorldsConsole::Helper.hide_cursor!
+WorldsConsole::Helper.output_mode_special!
 
 begin
-  Game.input_loop
+  WorldsConsole::Game.input_loop
 ensure
-  ConsoleHelper.output_mode_normal!
-  ConsoleHelper.show_cursor!
+  WorldsConsole::Helper.output_mode_normal!
+  WorldsConsole::Helper.show_cursor!
 end
