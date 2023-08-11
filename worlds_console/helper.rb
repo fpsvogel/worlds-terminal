@@ -13,12 +13,12 @@ module WorldsConsole
     # from "bleeding over" into output wherever an output line is shorter than a
     # line being inputted.
     # @parmam str [String] The string to print.
-    def self.puts_special(str)
+    def self.puts(str)
       # From https://gist.github.com/KINGSABRI/4687864
       terminal_width = `tput cols`.to_i
 
       output_mode_normal!
-      puts str.ljust(terminal_width, ' ')
+      Kernel.puts str.ljust(terminal_width, ' ')
       output_mode_special!
     end
   end

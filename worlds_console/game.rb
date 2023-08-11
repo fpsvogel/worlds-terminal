@@ -31,6 +31,9 @@ module WorldsConsole
 
           # Handle Backspace.
           if @input_buffer.include?(CTRL_BACKSPACE)
+            buffer_length = @input_buffer.length
+            print "█#{' ' * buffer_length}\r"
+
             @input_buffer = ''
           else
             while @input_buffer.length > 0 && @input_buffer.include?(BACKSPACE)
@@ -56,7 +59,7 @@ module WorldsConsole
           outputs.each do |output|
             return if output[:special] == :exit
 
-            Helper.puts_special PASTEL.send(output[:color], output[:content])
+            Helper.puts PASTEL.send(output[:color], output[:content])
           end
         end
 
