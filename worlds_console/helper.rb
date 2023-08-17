@@ -1,6 +1,9 @@
 module WorldsConsole
+  # Utility methods for allowing output above the input line on the console.
   class Helper
     # From https://stackoverflow.com/a/50152099
+    # If the cursor weren't hidden, it would appear at the beginning of the line
+    # due to ::output_mode_special!
     def self.hide_cursor! = print "\033[?25l"
     def self.show_cursor! = print "\033[?25h"
 

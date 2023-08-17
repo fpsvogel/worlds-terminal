@@ -1,12 +1,13 @@
-module WorldsConsole
-  class WorldsGemStub
+module Worlds
+  # A container for ::tick, which processes input and updates the world state.
+  class Updater
     UPDATES_PER_SECOND = 1
 
     # Processes input if any, or performs an update if enough time has passed.
-    # @param input [String] a line of input from the player.
+    # @param input [Hash] a line of input from the player.
     # @return [Array<Hash>, nil] an array of output hashes, if input was processed
     #   or an update was performed.
-    def self.loop(input = nil)
+    def self.tick(input = nil)
       # On why not Time.now, see
       # https://blog.dnsimple.com/2018/03/elapsed-time-with-ruby-the-right-way
       @time_start ||= Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -23,16 +24,16 @@ module WorldsConsole
     end
 
     # Processes input and returns output in response.
-    # @param input [String] a line of input from the player.
+    # @param input [Hash] a line of input from the player.
     # @return [Array<Hash>, nil] an array of output hashes.
-    def self.process_input(input)
+    private_class_method def self.process_input(input)
       outputs = []
 
-      outputs << { color: :white, content: "You said: #{input}" }
+      outputs << { color: :white, content: "You said: #{input[:command]}" }
 
-      if input == 'exit'
+      if input[:command] == 'exit'
         outputs << { color: :white, content: "Exiting..." }
-        outputs << { special: :exit }
+        outputs << { type: :exit }
       end
 
       outputs
@@ -40,11 +41,11 @@ module WorldsConsole
 
     # Updates the world state and returns any resulting output.
     # @return [Array<Hash>, nil] an array of output hashes.
-    def self.update
+    private_class_method def self.update
       outputs = []
 
-      seconds = 1.0 / UPDATES_PER_SECOND.round(2)
-      outputs << { color: :blue, content: "#{seconds} seconds have passed!" }
+      ms = 1000 / UPDATES_PER_SECOND.round(2)
+      outputs << { color: :blue, content: "#{ms} ms have passed!" }
 
       outputs
     end
