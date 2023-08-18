@@ -11,6 +11,18 @@ module WorldsConsole
     def self.hide_cursor! = print "\033[?25l"
     def self.show_cursor! = print "\033[?25h"
 
+    # Reads newly inputted characters in a way that doesn't block output,
+    # to allow output above the input line. Based on https://stackoverflow.com/a/9900628
+    # @return [String] all inputted characters.
+    def self.read_nonblock
+      line = ''
+
+      while char = STDIN.read_nonblock(1, exception: false)
+        return line if char == :wait_readable
+        line << char
+      end
+    end
+
     # To allow output above the input line, wraps `puts` in a change to the
     # terminal mode. Also right-pads the output with spaces to prevent the input
     # from "bleeding over" into output wherever an output line is shorter than a

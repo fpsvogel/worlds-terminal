@@ -1,5 +1,4 @@
 require 'pastel'
-require_relative 'io'
 require_relative 'helper'
 require_relative '../worlds/updater'
 
@@ -20,8 +19,7 @@ module WorldsConsole
         # disabled due to WorldsConsole::Helper::io_mode_raw!
         @input_buffer ||= ''
 
-        # STDIN inherits from IO, so here the monkey patch in IO is used.
-        new_input = STDIN.read_all_nonblock
+        new_input = Helper.read_nonblock
 
         if new_input
           return if new_input.include?(INTERRUPT)
