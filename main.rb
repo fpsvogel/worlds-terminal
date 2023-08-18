@@ -10,13 +10,13 @@ require_relative 'worlds_console/runner'
 # split into its own gem, which can be used by more than this console interface
 # (e.g. a web interface).
 module WorldsConsole
+  Helper.io_mode_raw!
   Helper.hide_cursor!
-  Helper.output_mode_special!
 
   begin
-    Runner.input_loop
+    Runner.io_loop
   ensure
-    Helper.output_mode_normal!
     Helper.show_cursor!
+    Helper.io_mode_normal!
   end
 end

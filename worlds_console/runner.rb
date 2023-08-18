@@ -14,10 +14,10 @@ module WorldsConsole
     INTERRUPT = "\x03" # Ctrl+C
 
     # Loops continuously, reading input and allowing Worlds to update and output.
-    def self.input_loop
+    def self.io_loop
       loop do
-        # An internal input buffer is needed because the console input buffer is
-        # disabled due to WorldsConsole::Helper::output_mode_special!
+        # We need our own input buffer here because the terminal input buffer is
+        # disabled due to WorldsConsole::Helper::io_mode_raw!
         @input_buffer ||= ''
 
         # STDIN inherits from IO, so here the monkey patch in IO is used.
@@ -30,7 +30,7 @@ module WorldsConsole
           new_input_has_newline = new_input.include?("\n") || new_input.include?("\r")
           new_input = new_input.split(/[\n\r]/).first if new_input_has_newline
 
-          # Add new input to buffer (or add nothing, if no new input or if Enter.)
+          # Add new input to buffer (or add nothing, if no new input).
           @input_buffer << (new_input || '')
 
           # Handle deletion: Ctrl + Backspace (line), or Backspace (character).
@@ -51,7 +51,7 @@ module WorldsConsole
           end
 
           # Echo input. The \r is to make the line replacable by new output,
-          # while the input will be echoed below the new output; in effect,
+          # while the input line will re-appear below the new output; in effect,
           # to allow output above the input line.
           print "#{@input_buffer}#{CURSOR}\r"
         end

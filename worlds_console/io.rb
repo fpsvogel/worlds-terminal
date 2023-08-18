@@ -1,7 +1,8 @@
 module WorldsConsole
   class ::IO
-    # To allow output above the input line.
-    # Based on https://stackoverflow.com/a/9900628
+    # Reads inputted characters one by one in a way that doesn't block output,
+    # to allow output above the input line. Based on https://stackoverflow.com/a/9900628
+    # @return [String] all inputted characters.
     def read_all_nonblock
       line = ''
 
