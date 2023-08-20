@@ -4,6 +4,10 @@ This is a CLI (command-line interface) app that runs ***Worlds***, a text-based 
 
 *Worlds* is still in early development—it's just an empty shell *(pun intended)*. This CLI app works on MacOS and Linux. Later on I plan on making it playable via a web interface as well.
 
+You can follow its development in the blog series "Building text-based game in Ruby":
+
+- ["Part 1: simultaneous, real-time input and output"](https://fpsvogel.com/posts/2023/ruby-text-adventure-real-time-input)
+
 ### Table of Contents
 
 - [Installation](#installation)
