@@ -1,6 +1,6 @@
 require 'pastel'
 require_relative 'helper'
-require_relative '../updater'
+require_relative 'updater'
 
 module Worlds
   module Console
