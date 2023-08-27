@@ -1,16 +1,29 @@
+require_relative 'special_commands'
+require_relative 'world'
+
 module Worlds
   # A container for ::tick, which processes input and updates the world state.
   class Updater
     UPDATES_PER_SECOND = 1
+
+    # Whether the world has been started.
+    # @return [Boolean]
+    def self.started?
+      !!@time_start
+    end
 
     # Processes input if any, or performs an update if enough time has passed.
     # @param input [Hash] a line of input from the player.
     # @return [Array<Hash>, nil] an array of output hashes, if input was processed
     #   or an update was performed.
     def self.tick(input = nil)
-      # On why not Time.now, see
-      # https://blog.dnsimple.com/2018/03/elapsed-time-with-ruby-the-right-way
-      @time_start ||= Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      unless started?
+        # On why not Time.now, see
+        # https://blog.dnsimple.com/2018/03/elapsed-time-with-ruby-the-right-way
+        @time_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+        return World.setup
+      end
 
       return process_input(input) if input
 
@@ -29,11 +42,14 @@ module Worlds
     private_class_method def self.process_input(input)
       outputs = []
 
-      outputs << { color: :white, content: "You said: #{input[:command]}" }
+      if action = SpecialCommands::ACTIONS[input[:command].to_sym]
+        outputs += action.call
+      else
+        outputs += [World.input(input)].flatten.compact
+      end
 
-      if input[:command] == 'exit'
-        outputs << { color: :white, content: "Exiting..." }
-        outputs << { type: :exit }
+      if outputs.empty?
+        outputs << { color: :red, content: "Invalid command: #{input[:command]}" }
       end
 
       outputs
@@ -45,7 +61,7 @@ module Worlds
       outputs = []
 
       ms = 1000 / UPDATES_PER_SECOND.round(2)
-      outputs << { color: :blue, content: "#{ms} ms have passed!" }
+      outputs += World.update(ms)
 
       outputs
     end

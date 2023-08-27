@@ -49,7 +49,7 @@ module Worlds
               print "#{@input_buffer}#{CURSOR}#{' ' * backspace_count}\r"
             end
 
-            # Echo input. The \r is to make the line replacable by new output,
+            # Echo input. The \r is to make the line replaceable by new output,
             # while the input line will re-appear below the new output; in effect,
             # to allow output above the input line.
             print "#{@input_buffer}#{CURSOR}\r"
