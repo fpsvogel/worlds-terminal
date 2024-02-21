@@ -2,14 +2,14 @@
 
 # Runs the game.
 
-require_relative '../lib/worlds/console/helper'
-require_relative '../lib/worlds/console/runner'
+require_relative '../lib/worlds/terminal/helper'
+require_relative '../lib/worlds/terminal/runner'
 
-# Not namespaced as Worlds::Console because the Worlds module will eventually be
-# split into its own gem, which can be used by more than this console interface
+# Not namespaced as Worlds::Terminal because the Worlds module will eventually be
+# split into its own gem, which can be used by more than this terminal interface
 # (e.g. a web interface).
 module Worlds
-  module Console
+  module Terminal
     Helper.io_mode_raw!
     Helper.hide_cursor!
 

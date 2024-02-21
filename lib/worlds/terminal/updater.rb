@@ -1,5 +1,5 @@
-require_relative 'special_commands'
-require_relative 'world'
+require_relative '../special_commands'
+require_relative '../world'
 
 module Worlds
   # A container for ::tick, which processes input and updates the world state.

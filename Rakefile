@@ -1,7 +1,7 @@
 require 'bundler/gem_tasks'
 require 'rake/testtask'
 require 'rubycritic/rake_task'
-require_relative 'lib/worlds/console/version'
+require_relative 'lib/worlds/terminal/version'
 
 task default: :test
 
@@ -23,18 +23,18 @@ RubyCritic::RakeTask.new(:crit) do |t|
   t.options = '--no-browser'
 end
 
-GEM_NAME = 'worlds-console'
+GEM_NAME = 'worlds-terminal'
 
 task :build do
   system "gem build #{GEM_NAME}.gemspec"
 end
 
 task :install => :build do
-  system "gem install #{GEM_NAME}-#{Worlds::Console::VERSION}.gem"
+  system "gem install #{GEM_NAME}-#{Worlds::Terminal::VERSION}.gem"
 end
 
 task :publish => :build do
-  system "gem push #{GEM_NAME}-#{Worlds::Console::VERSION}.gem"
+  system "gem push #{GEM_NAME}-#{Worlds::Terminal::VERSION}.gem"
 end
 
 task :clean do

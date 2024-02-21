@@ -1,5 +1,5 @@
 module Worlds
-  module Console
+  module Terminal
     # Utility methods for allowing output above the input line in the terminal.
     class Helper
       # To allow output above the input line, disables input buffering.

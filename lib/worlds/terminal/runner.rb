@@ -3,7 +3,7 @@ require_relative 'helper'
 require_relative 'updater'
 
 module Worlds
-  module Console
+  module Terminal
     # A container for the input loop, which is needed because input is read in
     # a non-blocking way, i.e. input is read while new output is displayed.
     class Runner

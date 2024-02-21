@@ -1,13 +1,13 @@
-require_relative 'lib/worlds/console/version'
+require_relative 'lib/worlds/terminal/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'worlds-console'
-  spec.version       = Worlds::Console::VERSION
+  spec.name          = 'worlds-terminal'
+  spec.version       = Worlds::Terminal::VERSION
   spec.authors       = ["Felipe Vogel"]
   spec.email         = ["fps.vogel@gmail.com"]
 
   spec.summary       = "A command-line interface for Worlds, a text-based world simulation and role-playing game toolkit."
-  spec.homepage      = "https://github.com/fpsvogel/worlds-console"
+  spec.homepage      = "https://github.com/fpsvogel/worlds-terminal"
   spec.license       = "MIT"
   spec.required_ruby_version = '>= 3.0.0'
 
@@ -23,8 +23,8 @@ Gem::Specification.new do |spec|
   spec.metadata['allowed_push_host'] = "https://rubygems.org"
 
   spec.metadata['homepage_uri'] = spec.homepage
-  spec.metadata['source_code_uri'] = "https://github.com/fpsvogel/worlds-console"
-  spec.metadata['changelog_uri'] = "https://github.com/fpsvogel/worlds-console/blob/master/CHANGELOG.md"
+  spec.metadata['source_code_uri'] = "https://github.com/fpsvogel/worlds-terminal"
+  spec.metadata['changelog_uri'] = "https://github.com/fpsvogel/worlds-terminal/blob/master/CHANGELOG.md"
 
   spec.files = Dir['lib/**/*.rb']
 

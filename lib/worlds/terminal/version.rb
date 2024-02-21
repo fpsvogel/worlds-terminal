@@ -1,5 +1,5 @@
 module Worlds
-  module Console
+  module Terminal
     VERSION = '0.1.0'
   end
 end
