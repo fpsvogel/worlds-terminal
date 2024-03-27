@@ -1,4 +1,4 @@
-<h1 align="center">*Worlds* terminal game</h1>
+<h1 align="center"><em>Worlds</em> terminal game</h1>
 
 This is a CLI (command-line interface) app that runs ***Worlds***, a text-based world simulation and role-playing game toolkit. With *Worlds*, you can create a virtual world and play a character in it.
 
